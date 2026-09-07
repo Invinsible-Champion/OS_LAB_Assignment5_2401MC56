@@ -29,6 +29,7 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+// Assignment 5: User-space system call stubs
 SYSCALL(shm_get)
 SYSCALL(sem_init)
 SYSCALL(sem_up)

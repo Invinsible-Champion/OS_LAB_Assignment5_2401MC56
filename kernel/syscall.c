@@ -103,6 +103,7 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+// Assignment 5: Extern declarations for new system calls
 extern int sys_shm_get(void);
 extern int sys_sem_init(void);
 extern int sys_sem_up(void);
@@ -130,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+// Assignment 5: Map syscall numbers to their handler functions
 [SYS_shm_get] sys_shm_get,
 [SYS_sem_init] sys_sem_init,
 [SYS_sem_up]  sys_sem_up,

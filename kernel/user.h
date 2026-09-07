@@ -23,6 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+// Assignment 5: User-space prototypes for new system calls
 void* shm_get(void);
 int sem_init(int, int);
 int sem_up(int);

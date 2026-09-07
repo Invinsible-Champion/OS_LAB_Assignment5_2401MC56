@@ -11,12 +11,17 @@
 extern char data[];  // defined by kernel.ld
 pde_t *kpgdir;  // for use in scheduler()
 
+// --- Assignment 5: Shared Memory Implementation ---
+// Global lock to protect shared memory initialization
 struct spinlock shm_lock;
+// Pointer to the single physical page shared among processes
 char *shm_page = 0;
 
+// Initializes the shared memory spinlock
 void shminit(void) {
   initlock(&shm_lock, "shm_lock");
 }
+// ------------------------------------------------
 
 
 
@@ -89,11 +94,16 @@ mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm)
   return 0;
 }
 
+// --- Assignment 5: shm_get syscall ---
+// Returns a pointer to a shared memory page mapped at 0x40000000.
+// If the page doesn't exist, it allocates it.
+// Maps the same physical page for any process that calls it.
 void* shm_get(void) {
-  uint va = 0x40000000;
+  uint va = 0x40000000; // Fixed virtual address for shared page
   
   acquire(&shm_lock);
   if(!shm_page) {
+    // Allocate the shared page the first time it is requested
     shm_page = kalloc();
     memset(shm_page, 0, PGSIZE);
   }
@@ -101,12 +111,14 @@ void* shm_get(void) {
 
   pte_t *pte = walkpgdir(myproc()->pgdir, (void*)va, 0);
   if(!pte || !(*pte & PTE_P)) {
+    // Map the physical page into the calling process's page table with Write and User privileges
     if(mappages(myproc()->pgdir, (void*)va, PGSIZE, V2P(shm_page), PTE_W|PTE_U) < 0) {
       return (void*)-1;
     }
   }
   return (void*)va;
 }
+// -------------------------------------
 
 // There is one page table per process, plus one that's used when
 // a CPU is not running any process (kpgdir). The kernel uses the
@@ -300,6 +312,7 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       if(pa == 0)
         panic("kfree");
       char *v = P2V(pa);
+      // Assignment 5: Do not free the shared memory page when a process exits or unmaps memory
       if(v != shm_page)
         kfree(v);
       *pte = 0;
@@ -382,6 +395,7 @@ uva2ka(pde_t *pgdir, char *uva)
   pte_t *pte;
 
   pte = walkpgdir(pgdir, uva, 0);
+  // Assignment 5: Handle null page table entry gracefully to avoid crash (ud2 injected by modern GCC)
   if(pte == 0)
     return 0;
   if((*pte & PTE_P) == 0)

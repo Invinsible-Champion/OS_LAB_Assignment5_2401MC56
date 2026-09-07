@@ -20,6 +20,7 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+// Assignment 5: New system calls for Shared Memory and Semaphores
 #define SYS_shm_get 22
 #define SYS_sem_init 23
 #define SYS_sem_up 24

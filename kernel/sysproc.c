@@ -91,16 +91,18 @@ sys_uptime(void)
   return xticks;
 }
 
-// Semaphores
+// --- Assignment 5: Semaphores Implementation ---
 #define MAX_SEM 10
+// Structure representing a counting semaphore
 struct sem {
-  struct spinlock lock;
-  int count;
-  int active;
+  struct spinlock lock; // Protects the semaphore's count to ensure atomicity
+  int count;            // Current value of the semaphore
+  int active;           // 1 if initialized/in-use, 0 otherwise
 };
 
 struct sem sems[MAX_SEM];
 
+// Initialize all semaphores to inactive state during boot
 void
 seminit(void)
 {
@@ -111,6 +113,7 @@ seminit(void)
   }
 }
 
+// Syscall to initialize a specific semaphore to a given count
 int
 sys_sem_init(void)
 {
@@ -127,6 +130,7 @@ sys_sem_init(void)
   return 0;
 }
 
+// Syscall to decrement (wait/P) a semaphore
 int
 sys_sem_down(void)
 {
@@ -137,6 +141,7 @@ sys_sem_down(void)
     return -1;
   
   acquire(&sems[id].lock);
+  // Sleep while the count is 0, releasing the lock to allow others to run
   while(sems[id].count == 0) {
     sleep(&sems[id], &sems[id].lock);
   }
@@ -145,6 +150,7 @@ sys_sem_down(void)
   return 0;
 }
 
+// Syscall to increment (signal/V) a semaphore
 int
 sys_sem_up(void)
 {
@@ -156,13 +162,16 @@ sys_sem_up(void)
   
   acquire(&sems[id].lock);
   sems[id].count++;
+  // Wake up any processes sleeping on this semaphore
   wakeup(&sems[id]);
   release(&sems[id].lock);
   return 0;
 }
+// ----------------------------------------------
 
 extern void* shm_get(void);
 
+// Wrapper syscall to call the kernel shm_get implementation
 int
 sys_shm_get(void)
 {

@@ -157,7 +157,7 @@ int             fetchstr(uint, char**);
 void            syscall(void);
 
 // sysproc.c
-void            seminit(void);
+void            seminit(void); // Assignment 5: Initialize semaphores
 
 // timer.c
 void            timerinit(void);
@@ -188,7 +188,7 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
-void            shminit(void);
+void            shminit(void); // Assignment 5: Initialize shared memory
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

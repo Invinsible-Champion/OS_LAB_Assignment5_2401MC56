@@ -28,8 +28,8 @@ main(void)
   cprintf("console initialized\n");
   uartinit();      // serial port
   pinit();         // process table
-  shminit();       // shared memory
-  seminit();       // semaphores
+  shminit();       // Assignment 5: Initialize shared memory subsystem
+  seminit();       // Assignment 5: Initialize semaphore subsystem
   tvinit();        // trap vectors
   binit();         // buffer cache
   fileinit();      // file table
